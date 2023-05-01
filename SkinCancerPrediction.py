@@ -28,13 +28,13 @@ dataset['Class'] = dataset['Class'].replace([1, 2, 3, 4, 5], 0)
 dataset['Class'] = dataset['Class'].replace(6, 1)
 
 
-# Visualization of variable distribution
-for i in range(34):
-    sns.histplot(data=dataset.iloc[:, i])
-    plt.show()
-    sns.boxplot(data=dataset.iloc[:, i])
-    plt.title(column_names[i])
-    plt.show()
+# # Visualization of variable distribution
+# for i in range(34):
+#     sns.histplot(data=dataset.iloc[:, i])
+#     plt.show()
+#     sns.boxplot(data=dataset.iloc[:, i])
+#     plt.title(column_names[i])
+#     plt.show()
 
 
 # Assigning input features and output label
@@ -85,7 +85,7 @@ import tensorflow as tf
 # Initialize ANN
 ann=tf.keras.models.Sequential()
 # Add first/input layer of neural network equal to the number of input features
-ann.add(tf.keras.layers.Dense(units=33,activation='relu'))
+ann.add(tf.keras.layers.Dense(units=34,activation='relu'))
 # Add second/hidden layer of neural network
 ann.add(tf.keras.layers.Dense(units=7,activation='relu'))
 # Adding the output layer
@@ -179,17 +179,13 @@ for cf, cfName in zip(classifierObjects, classifierNames):
 
 
 
-# Plots for ROC, PRC, AUC
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, precision_recall_curve
 
-# Example data
-#y_true = np.array([0, 0, 1, 1])
 for cf, cfName in zip(classifierObjects, classifierNames):
     if cfName == "Artificial Neural Network":
         y_score = cf.predict(X_test)
     else:
         y_score = cf.predict_proba(X_test)[:, 1]
-    # Calculate ROC curve and AUC
     fpr, tpr, thresholds = roc_curve(y_test, y_score)
     roc_auc = auc(fpr, tpr)
     # Plot ROC curve
@@ -201,4 +197,17 @@ for cf, cfName in zip(classifierObjects, classifierNames):
     plt.ylabel('True Positive Rate')
     plt.title(f'{cfName}: receiver operating characteristic (ROC) curve')
     plt.legend(loc="lower right")
+    plt.show()
+    
+    precision, recall, thresholds = precision_recall_curve(y_test, y_score)
+    pr_auc = auc(recall, precision)
+    
+    # Plot PRC
+    plt.plot(recall, precision, lw=1, label='PRC (AUC = %0.2f)' % (pr_auc))
+    plt.xlim([-0.05, 1.05])
+    plt.ylim([-0.05, 1.05])
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title(f'{cfName}: Precision-Recall Curve')
+    plt.legend(loc="lower left")
     plt.show()
